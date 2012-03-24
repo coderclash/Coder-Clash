@@ -8,6 +8,18 @@ class BaseHandler(tornado.web.RequestHandler):
     """
     Base handler to rule them all.
     """
+    def get_full_url(self, url):
+        """
+        This is a utility method to provide a full URL for API calls.
+        """
+        if not url.startswith('/'):
+            return url
+
+        url = url.lstrip('/')
+        return '{protocol}://{host}/{url}'.format(
+                protocol=self.request.protocol,
+                host=self.request.host,
+                url=url)
 
     @property
     def db(self):
