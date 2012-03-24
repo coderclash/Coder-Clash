@@ -33,8 +33,16 @@ class GithubAuthMixin(OAuth2Mixin):
         The following is returned as a part of the user object:
 
 
-        ``github_request()``
+        ::todo::
+            - ``_get_user_info``:
+                decide what fields are mandatory to get and what are
+                optional.
 
+            - More inline examples of how methods work, especially
+              ``github_request``
+
+
+            - Testing.
         """
 
     _OAUTH_ACCESS_TOKEN_URL = "https://github.com/login/oauth/access_token"
@@ -63,11 +71,7 @@ class GithubAuthMixin(OAuth2Mixin):
         args = escape.parse_qs_bytes(escape.native_str(response.body))
 
         session = {}
-
-        try:
-            session['access_token'] = args.get('access_token')[0]
-        except TypeError:
-            session['access_token'] = ''
+        session['access_token'] = args.get('access_token')[0]
 
         self.github_request(
             path='/user',

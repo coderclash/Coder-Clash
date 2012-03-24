@@ -1,5 +1,5 @@
-import httplib
 import asyncmongo
+import tornado.escape
 import tornado.web
 from coderclash.settings import DB
 
@@ -28,7 +28,13 @@ class BaseHandler(tornado.web.RequestHandler):
         return self._db
 
     def get_current_user(self):
-        pass
+        """
+        Gets the current users info from the user cookie
+        """
+        user = self.get_secure_cookie('user')
+        if not user:
+            return None
+        return tornado.escape.json_decode(user)
 
     def get_error_html(self, status_code, **kwargs):
         pass
