@@ -6,6 +6,7 @@ class Game(object):
 
     A game will have a goal and rules.
     """
+
     def __init__(self, players):
         self.players = set(players)
 
@@ -21,6 +22,10 @@ class Game(object):
 
         for player in self.players:
             pass
+
+    def close(self):
+        for player in self.players:
+            player.leave()
 
     def __unicode__(self):
         return u'{0} players in game.'.format(len(self.players))

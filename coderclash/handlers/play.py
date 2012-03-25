@@ -39,10 +39,15 @@ class PlaySocket(tornadio2.SocketConnection):
         for player in players:
             if player.state == 'ready':
                 player.connection.send(
-                        'Match starts in {0} seconds.'.format(countdown))
+                    'Match starts in {0} seconds.'.format(countdown)
+                )
 
         for game in games:
-            game.tick()
+            if len(game.players) > 1:
+                game.tick()
+            else:
+                game.close()
+                games.remove(game)
 
         if countdown == 0:
             self.start_matches()
@@ -77,8 +82,8 @@ class PlaySocket(tornadio2.SocketConnection):
     def start_matches(self):
         players_to_game = set([p for p in players if p.state == 'ready'])
 
-        # might be wise to collect groups of... say 2 or 4 instead of
-        # all players who are ready
+        # might be wise to collect groups of... say 2 or 4 instead
+        # of all players who are ready
         if len(players_to_game) > 1:
             games.add(Game(players_to_game))
 
