@@ -1,14 +1,15 @@
 import os
+from secrets import *
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PORT = 8000
 DEBUG = True
 
 DB = {
-    'NAME': 'coderclash',
-    'HOST': '127.0.0.1',
-    'PORT': 27017,
-    'POOL_ID': '',
-    'MAX_CACHED': 10,
-    'MAX_CONNECTIONS': 50
+    'dbname': 'coderclash',
+    'host': '127.0.0.1',
+    'port': 27017,
+    'pool_id': 'coderclash',
+    'maxcached': 10,
+    'maxconnections': 50
 }
