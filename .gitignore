@@ -1,4 +1,5 @@
 .DS_Store
+.sass-cache
 *.egg-info
 *.pyc
 coderclash/secrets.py
