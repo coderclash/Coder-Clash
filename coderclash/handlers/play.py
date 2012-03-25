@@ -23,6 +23,11 @@ countdown = int(COUNTDOWN)
 
 
 class PlaySocket(tornadio2.SocketConnection):
+    """
+    This is the interface for speaking to the client through websockets. Game
+    and Player state are constantly given to the client. The client sends
+    commands that update both their and the games state.
+    """
     def __init__(self, *args, **kwargs):
         super(PlaySocket, self).__init__(*args, **kwargs)
 
@@ -32,17 +37,12 @@ class PlaySocket(tornadio2.SocketConnection):
             callback.start()
 
     def tick(self):
-        global countdown
 
-        print 'players', [unicode(p) for p in players]
-        print 'games', [unicode(g) for g in games]
+        print datetime.now()
+        print ' ', 'players', [unicode(p) for p in players]
+        print ' ', 'games', [unicode(g) for g in games]
 
-        for player in players:
-            if player.state == 'ready':
-                player.connection.send(
-                    'Match starts in {0} seconds.'.format(countdown)
-                )
-
+        # tick or remove current games
         for game in games:
             if len(game.players) > 1:
                 game.tick()
@@ -50,26 +50,25 @@ class PlaySocket(tornadio2.SocketConnection):
                 game.close()
                 games.remove(game)
 
-        if countdown == 0:
-            self.start_matches()
-            countdown = int(COUNTDOWN)
-        else:
-            countdown -= 1
+        self.start_matches()
 
-        # TODO: send state to client
-
+        for player in players:
+            player.connection.emit('state',
+                player=player.get_state(),
+                game=player.game_state()
+            )
 
     def on_open(self, message):
         player = Player(connection=self)
         players.add(player)
 
-    def get_player(self):
+    def get_connected_player(self):
         for player in players:
             if player.connection == self:
                 return player
 
     def on_close(self):
-        player = self.get_player()
+        player = self.get_connected_player()
 
         if player.state == 'in_game':
             player.leave()
@@ -81,16 +80,32 @@ class PlaySocket(tornadio2.SocketConnection):
 
 
     def start_matches(self):
-        players_to_game = set([p for p in players if p.state == 'ready'])
+        """
+        Decrement the countdown, if 0, start the match & reset countdown.
+        """
+        global countdown
 
-        # might be wise to collect groups of... say 2 or 4 instead
-        # of all players who are ready
-        if len(players_to_game) > 1:
-            games.add(Game(players_to_game))
+        if countdown == 0:
+            players_to_game = set([p for p in players if p.state == 'ready'])
+
+            # might be wise to collect groups of... say 2 or 4 instead
+            # of all players who are ready
+            if len(players_to_game) > 1:
+                games.add(Game(players_to_game))
+
+            countdown = int(COUNTDOWN)
+        else:
+            countdown -= 1
+
+        for player in players:
+            if player.state == 'ready':
+                player.connection.send(
+                    'Match starts in {0} seconds.'.format(countdown)
+                )
 
     @tornadio2.event
     def player_state(self, state):
-        player = self.get_player()
+        player = self.get_connected_player()
 
         if state == 'ready':
             player.ready()

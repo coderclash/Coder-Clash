@@ -43,5 +43,15 @@ class Player(object):
         self.game = None
 
 
+    def get_state(self):
+        return dict(
+            state=self.state,
+        )
+
+    def game_state(self):
+        if self.game:
+            return self.game.get_state()
+        return None
+
     def __unicode__(self):
         return '<Player {0}>'.format(self.state)

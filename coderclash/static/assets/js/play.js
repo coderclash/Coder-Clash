@@ -9,6 +9,9 @@ $(document).ready(function() {
   socket.on('message', function(message) {
     return console.log(message);
   });
+  socket.on('state', function(state) {
+    return console.log(JSON.stringify(state));
+  });
   socket.on('disconnect', function() {
     return console.log('disconnected');
   });

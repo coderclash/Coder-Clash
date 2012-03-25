@@ -8,6 +8,9 @@ $(document).ready ->
   socket.on 'message', (message) ->
     console.log message
 
+  socket.on 'state', (state) ->
+    console.log JSON.stringify state
+
   socket.on 'disconnect', ->
     console.log 'disconnected'
 
@@ -17,3 +20,5 @@ $(document).ready ->
 
   $(document).on 'click', '.player-status', ->
     socket.emit 'player_state', { state: 'ready' }
+
+
