@@ -3,6 +3,10 @@ $(document).ready ->
 
   socket.on 'connect', ->
     console.log 'connected'
+    socket.send('connected!')
+
+  socket.on 'message', (message) ->
+    console.log message
 
   socket.on 'disconnect', ->
     console.log 'disconnected'
