@@ -20,11 +20,11 @@ class Game(object):
         Called every second by the loop.
         """
 
-        for player in self.players:
+        for player in set(self.players):
             pass
 
     def close(self):
-        for player in self.players:
+        for player in set(self.players):
             player.leave()
 
 

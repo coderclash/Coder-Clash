@@ -45,7 +45,7 @@ class PlaySocket(tornadio2.SocketConnection):
         self.tick_games()
         self.start_games()
 
-        self.give_state()
+        self.update_players()
 
     def print_info(self):
         print datetime.now()
@@ -65,7 +65,7 @@ class PlaySocket(tornadio2.SocketConnection):
         Ticks each live game, or, closes the game if fewer than
         2 players remain.
         """
-        for game in games:
+        for game in set(games):
             if len(game.players) > 1:
                 game.tick()
             else:
@@ -133,15 +133,18 @@ class PlaySocket(tornadio2.SocketConnection):
             if player.socket == self:
                 return player
 
-    def give_state(self):
+    def give_state(self, player):
+        player.socket.emit('state',
+            player=player.get_state(),
+            game=player.game_state()
+        )
+
+    def update_players(self):
         """
         Give each connected player their state.
         """
         for player in players:
-            player.socket.emit('state',
-                player=player.get_state(),
-                game=player.game_state()
-            )
+            self.give_state(player)
 
     @tornadio2.event
     def command(self, command):

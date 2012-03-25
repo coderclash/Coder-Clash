@@ -22,6 +22,7 @@ PlayerWindow = Backbone.View.extend
 
   render: () ->
     context = @player.toJSON()
+    context.inGame = context.state == 'in_game'
     @$el.html @template(context)
 
   events: 
@@ -35,7 +36,7 @@ PlayerWindow = Backbone.View.extend
 $(document).ready ->
   window.socket = io.connect 'http://localhost:8001'
 
-  # initialize players and view
+  # initialize player and view
   player = new Player 
     state: 'not_ready'
 
@@ -45,7 +46,7 @@ $(document).ready ->
 
 
   window.socket.on 'message', (message) ->
-    console.log message
+    $('.message').text message
 
   window.socket.on 'state', (state) ->
     player.set state.player

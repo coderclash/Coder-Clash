@@ -42,6 +42,7 @@ class Player(object):
     def leave(self):
         self.game.players.remove(self)
         self.game = None
+        self.socket.give_state(self)
 
 
     def get_state(self):

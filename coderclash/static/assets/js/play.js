@@ -21,6 +21,7 @@ PlayerWindow = Backbone.View.extend({
   render: function() {
     var context;
     context = this.player.toJSON();
+    context.inGame = context.state === 'in_game';
     return this.$el.html(this.template(context));
   },
   events: {
@@ -42,7 +43,7 @@ $(document).ready(function() {
     player: player
   });
   window.socket.on('message', function(message) {
-    return console.log(message);
+    return $('.message').text(message);
   });
   return window.socket.on('state', function(state) {
     return player.set(state.player);

@@ -13,9 +13,14 @@
   <script id="player-template" type="text/x-handlebars-template">
     <h1>You are {{!state}}.</h1>
 
-    <div class="btn btn-info" data-player-command="ready">I am ready.</div>
-    <div class="btn btn-info" data-player-command="not_ready">I am not ready.</div>
-    <div class="btn btn-info" data-player-command="leave">Leave the game.</div>
+    <div class="message"></div>
+
+    {{!#if inGame }}
+      <div class="btn btn-info" data-player-command="leave">Leave the game.</div>
+    {{!else}}
+      <div class="btn btn-info" data-player-command="ready">I am ready.</div>
+      <div class="btn btn-info" data-player-command="not_ready">I am not ready.</div>
+    {{!/if}}
   </script>
   
 
