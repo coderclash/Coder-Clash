@@ -1,0 +1,8 @@
+$(document).ready ->
+  socket = io.connect 'http://localhost:8001'
+
+  socket.on 'connect', ->
+    console.log 'connected'
+
+  socket.on 'disconnect', ->
+    console.log 'disconnected'

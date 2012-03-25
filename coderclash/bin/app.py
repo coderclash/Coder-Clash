@@ -5,6 +5,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import tornadio2
 from tornado.options import define, options
 from coderclash import settings
 from coderclash.urls import urls
@@ -37,12 +38,26 @@ class Application(tornado.web.Application):
 
         tornado.web.Application.__init__(self, urls, **app_settings)
 
+# import play and get socket server running
+from coderclash.handlers import PlaySocket
+PlayRouter = tornadio2.router.TornadioRouter(PlaySocket)
+sock_app = tornado.web.Application(
+    PlayRouter.urls,
+    #flash_policy_port = 843,
+    #flash_policy_file = os.path.join(settings.BASE_DIR, 'static/assets/flashpolicy.xml'),
+    socket_io_port = 8001
+)
 
 def main():
     tornado.options.parse_command_line()
-    logging.info("starting webserver on 127.0.0.1:%d" % options.port)
+
+    # create http server
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
+
+    # Create tornadio server on port 8002, but don't start it yet
+    tornadio2.server.SocketServer(sock_app, auto_start=False)
+
     tornado.ioloop.IOLoop.instance().start()
 
 
