@@ -21,6 +21,7 @@ games = set()
 COUNTDOWN = 10
 countdown = int(COUNTDOWN)
 
+
 class PlaySocket(tornadio2.SocketConnection):
     def __init__(self, *args, **kwargs):
         super(PlaySocket, self).__init__(*args, **kwargs)

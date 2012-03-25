@@ -11,6 +11,9 @@ $(document).ready ->
   socket.on 'disconnect', ->
     console.log 'disconnected'
 
+  # TODO: might make sense to do Backbone here?
+  # that way state changes can just trigger .change events on
+  # the models and rerender the views like nobody's business
 
   $(document).on 'click', '.player-status', ->
     socket.emit 'player_state', { state: 'ready' }
