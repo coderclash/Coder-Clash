@@ -104,8 +104,9 @@ class PlaySocket(tornadio2.SocketConnection):
                 )
 
     @tornadio2.event
-    def player_state(self, state):
+    def command(self, command):  # target state...
         player = self.get_connected_player()
 
-        if state == 'ready':
-            player.ready()
+        commands = ['ready', 'not_ready', 'leave']
+        if command in commands:
+            getattr(player, command)(silent=True)

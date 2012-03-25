@@ -24,10 +24,25 @@ class FMSTest(unittest.TestCase):
         car.turn_on()
         self.assertEquals('on', car.state)
 
-        # already on
+        # already on, raise error
         self.assertRaises(car.turn_on)
         self.assertEquals('on', car.state)
 
         car.turn_off()
         car.turn_off() # can do it twice!
+        self.assertEquals('off', car.state)
+
+    def test_silent(self):
+        car = Car()
+        self.assertEquals('off', car.state)
+
+        car.turn_on(silent=True)
+        self.assertEquals('on', car.state)
+
+        # silent fail
+        car.turn_on(silent=True)
+        self.assertEquals('on', car.state)
+
+        car.turn_off(silent=True)
+        car.turn_off(silent=True) # can do it twice!
         self.assertEquals('off', car.state)

@@ -1,23 +1,50 @@
+var Player, PlayerWindow;
+
+Player = Backbone.Model.extend({
+  dispatch: function(command) {
+    return window.socket.emit('command', {
+      command: command
+    });
+  }
+});
+
+PlayerWindow = Backbone.View.extend({
+  initialize: function(options) {
+    var source;
+    _.bindAll(this);
+    source = $('#player-template').html();
+    this.template = Handlebars.compile(source);
+    this.player = options.player;
+    this.player.on('change', this.render);
+    return this.render();
+  },
+  render: function() {
+    var context;
+    context = this.player.toJSON();
+    return this.$el.html(this.template(context));
+  },
+  events: {
+    'click *[data-player-command]': 'dispatch'
+  },
+  dispatch: function(e) {
+    return this.player.dispatch($(e.currentTarget).attr('data-player-command'));
+  }
+});
 
 $(document).ready(function() {
-  var socket;
-  socket = io.connect('http://localhost:8001');
-  socket.on('connect', function() {
-    console.log('connected');
-    return socket.send('connected!');
+  var player, player_view;
+  window.socket = io.connect('http://localhost:8001');
+  player = new Player({
+    state: 'not_ready'
   });
-  socket.on('message', function(message) {
+  player_view = new PlayerWindow({
+    el: $('div[data-player-canvas=true]'),
+    player: player
+  });
+  window.socket.on('message', function(message) {
     return console.log(message);
   });
-  socket.on('state', function(state) {
-    return console.log(JSON.stringify(state));
-  });
-  socket.on('disconnect', function() {
-    return console.log('disconnected');
-  });
-  return $(document).on('click', '.player-status', function() {
-    return socket.emit('player_state', {
-      state: 'ready'
-    });
+  return window.socket.on('state', function(state) {
+    return player.set(state.player);
   });
 });

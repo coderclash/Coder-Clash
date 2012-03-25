@@ -33,6 +33,7 @@ class Player(object):
     def not_ready(self):
         pass
 
+
     @fsm('in_game', whence=['ready'])
     def join(self, game):
         self.game = game

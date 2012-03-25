@@ -10,13 +10,18 @@ def fsm(target, whence='*', attr='state'):
 
     def function(method):
         def inner(self, *args, **kwargs):
+            silent = kwargs.pop('silent', False)
+
             # check that whence
             if whence == '*':
                 pass
             elif getattr(self, attr) in whence:
                 pass
             else:
-                raise Exception('You shall not pass!')
+                if not silent:
+                    raise Exception('You shall not pass!')
+                else:
+                    return None
 
             result = method(self, *args, **kwargs)
             setattr(self, attr, target) # set target
