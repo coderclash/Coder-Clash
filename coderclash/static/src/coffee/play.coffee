@@ -10,3 +10,7 @@ $(document).ready ->
 
   socket.on 'disconnect', ->
     console.log 'disconnected'
+
+
+  $(document).on 'click', '.player-status', ->
+    socket.emit 'player_state', { state: 'ready' }

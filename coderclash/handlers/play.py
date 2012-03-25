@@ -4,6 +4,8 @@ from datetime import datetime
 
 from coderclash.handlers.base import BaseHandler
 
+from coderclash.engine import Player, Game
+
 
 class Play(BaseHandler):
     def get(self):
@@ -12,7 +14,12 @@ class Play(BaseHandler):
 
 
 callback = None
-participants = set()
+
+players = set()
+games = set()
+
+COUNTDOWN = 10
+countdown = int(COUNTDOWN)
 
 class PlaySocket(tornadio2.SocketConnection):
     def __init__(self, *args, **kwargs):
@@ -20,18 +27,64 @@ class PlaySocket(tornadio2.SocketConnection):
 
         global callback
         if callback is None:
-            callback = tornado.ioloop.PeriodicCallback(self.send_time, 5000)
+            callback = tornado.ioloop.PeriodicCallback(self.tick, 1000)
             callback.start()
 
-    def send_time(self):
-        for p in participants:
-            p.send(str(datetime.now()))
+    def tick(self):
+        global countdown
+
+        print 'players', [unicode(p) for p in players]
+        print 'games', [unicode(g) for g in games]
+
+        for player in players:
+            if player.state == 'ready':
+                player.connection.send(
+                        'Match starts in {0} seconds.'.format(countdown))
+
+        for game in games:
+            game.tick()
+
+        if countdown == 0:
+            self.start_matches()
+            countdown = int(COUNTDOWN)
+        else:
+            countdown -= 1
+
+        # TODO: send state to client
+
 
     def on_open(self, message):
-        participants.add(self)
+        player = Player(connection=self)
+        players.add(player)
+
+    def get_player(self):
+        for player in players:
+            if player.connection == self:
+                return player
 
     def on_close(self):
-        participants.remove(self)
+        player = self.get_player()
+
+        if player.state == 'in_game':
+            player.leave()
+
+        players.remove(player)
 
     def on_message(self, message):
-        self.send('hey!')
+        pass
+
+
+    def start_matches(self):
+        players_to_game = set([p for p in players if p.state == 'ready'])
+
+        # might be wise to collect groups of... say 2 or 4 instead of
+        # all players who are ready
+        if len(players_to_game) > 1:
+            games.add(Game(players_to_game))
+
+    @tornadio2.event
+    def player_state(self, state):
+        player = self.get_player()
+
+        if state == 'ready':
+            player.ready()

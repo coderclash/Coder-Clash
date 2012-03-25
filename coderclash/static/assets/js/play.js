@@ -9,7 +9,12 @@ $(document).ready(function() {
   socket.on('message', function(message) {
     return console.log(message);
   });
-  return socket.on('disconnect', function() {
+  socket.on('disconnect', function() {
     return console.log('disconnected');
+  });
+  return $(document).on('click', '.player-status', function() {
+    return socket.emit('player_state', {
+      state: 'ready'
+    });
   });
 });
