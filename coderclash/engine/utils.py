@@ -1,14 +1,35 @@
 
 def fsm(target, whence='*', attr='state'):
     """
-    Ensure the states are good.
-
+    `target` should be the target state
     `whence` should be a list of states that you can change from.
 
-    `target` should be the target state
+    Example:
+
+        class Car(object):
+            state = 'off'
+
+            @fsm('on', whence=['off'])
+            def turn_on(self):
+                pass
+
+            @fsm('off', whence=['on'])
+            def turn_off(self):
+                pass
+
+        car = Car()
+        # state is 'off'
+
+        car.turn_off()  # raise Exception
+        car.turn_off(silent=True)  # fails silently
+        # state is still 'off'
+
+        car.turn_on()
+        # state is 'on
+
     """
 
-    def function(method):
+    def dec(method):
         def inner(self, *args, **kwargs):
             silent = kwargs.pop('silent', False)
 
@@ -24,8 +45,10 @@ def fsm(target, whence='*', attr='state'):
                     return None
 
             result = method(self, *args, **kwargs)
-            setattr(self, attr, target) # set target
+            setattr(self, attr, target) # set state to target
+
             return result
         return inner
 
-    return function
+    return dec
+

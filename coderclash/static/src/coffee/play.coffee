@@ -25,7 +25,7 @@ PlayerWindow = Backbone.View.extend
     context.inGame = context.state == 'in_game'
     @$el.html @template(context)
 
-  events: 
+  events:
     'click *[data-player-command]': 'dispatch'
 
   dispatch: (e) ->

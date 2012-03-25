@@ -87,14 +87,14 @@ class PlaySocket(tornadio2.SocketConnection):
             # of all players who are ready
             if len(players_to_game) > 1:
                 games.add(Game(players_to_game))
-                message = 'Match starting!'
+                message = 'Game starting!'
             else:
-                message = 'Not enough players to start match.'
+                message = 'Not enough players to start game.'
 
             # reset
             countdown = int(COUNTDOWN)
         else:
-            message = 'Match starts in {0} seconds.'.format(countdown)
+            message = 'Next game starts in {0} seconds.'.format(countdown)
             countdown -= 1
 
         # send info to players...
@@ -134,7 +134,8 @@ class PlaySocket(tornadio2.SocketConnection):
                 return player
 
     def give_state(self, player):
-        player.socket.emit('state',
+        player.socket.emit(
+            'state',
             player=player.get_state(),
             game=player.game_state()
         )
