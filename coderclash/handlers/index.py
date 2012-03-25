@@ -5,4 +5,4 @@ class Index(BaseHandler):
 
     def get(self):
         user = self.get_current_user()
-        self.write(self.render('base.html'), user=user)
+        self.write(self.render('base.html', user=user))

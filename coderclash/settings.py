@@ -1,7 +1,7 @@
 import os
 from secrets import *
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(__file__)
 PORT = 8000
 DEBUG = True
 
