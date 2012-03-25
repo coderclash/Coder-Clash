@@ -12,27 +12,26 @@ class Play(BaseHandler):
 
 
 callback = None
+participants = set()
 
 class PlaySocket(tornadio2.SocketConnection):
     def __init__(self, *args, **kwargs):
         super(PlaySocket, self).__init__(*args, **kwargs)
-        global callback
 
+        global callback
         if callback is None:
-            callback = tornado.ioloop.PeriodicCallback(self.send_time, 1000)
+            callback = tornado.ioloop.PeriodicCallback(self.send_time, 5000)
             callback.start()
 
-    participants = set()
-
     def send_time(self):
-        for p in self.participants:
+        for p in participants:
             p.send(str(datetime.now()))
 
     def on_open(self, message):
-        self.participants.add(self)
+        participants.add(self)
 
     def on_close(self):
-        self.participants.remove(self)
+        participants.remove(self)
 
     def on_message(self, message):
         self.send('hey!')
