@@ -19,8 +19,8 @@ class Player(object):
 
     """
 
-    def __init__(self, connection):
-        self.connection = connection
+    def __init__(self, socket):
+        self.socket = socket
         self.state = 'not_ready'
         self.game = None
 
