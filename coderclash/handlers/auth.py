@@ -13,10 +13,6 @@ class AuthLogin(BaseHandler, github.GithubAuthMixin):
 
     If that code is present, authenticate the user with
     ``get_authenticated_user``
-
-    ::todo::
-        - Not all user data needs to be in the cookie. Trim it down.
-
     """
     @tornado.web.asynchronous
     def get(self):
@@ -26,7 +22,8 @@ class AuthLogin(BaseHandler, github.GithubAuthMixin):
                 self.settings['github_client_id'],
                 self.settings['github_client_secret'],
                 self.get_argument('code'),
-                self.async_callback(self._on_auth))
+                self.async_callback(self._on_auth),
+                extra_fields=set(['html_url', 'bio']))
             return
         self.authorize_redirect(
             redirect_uri=self.settings['github_callback_url'],
@@ -42,9 +39,10 @@ class AuthLogin(BaseHandler, github.GithubAuthMixin):
             callback=self.async_callback(self._finish_query, user))
 
     def _finish_query(self, user, response, error=None):
-        self.set_secure_cookie("user", tornado.escape.json_encode(user))
+        user_info = {
+            'id': user.get('id'),
+            'name': user.get('name'),
+            'avatar_url': user.get('avatar_url')
+        }
+        self.set_secure_cookie("user", tornado.escape.json_encode(user_info))
         self.redirect(self.get_argument("next", "/"))
-
-
-# class AuthLogout(AuthMixin, BaseHandler):
-#     pass
