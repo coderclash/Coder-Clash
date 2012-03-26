@@ -47,8 +47,15 @@ class Player(object):
 
 
     def get_state(self):
+        if self.best:
+            best = dict(
+                score=self.best[0],
+                results=self.best[1],
+                errors=self.best[2]
+            )
         return dict(
             state=self.state,
+            best=best if self.best else None
         )
 
     def game_state(self):

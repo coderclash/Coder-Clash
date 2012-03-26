@@ -15,27 +15,68 @@
 
 {% block content %}
   
-  {% raw '<script id="player-template" type="text/x-handlebars-template">' %}
+  {# JS TEMPLATE!!! #}{% raw '<script id="player-template" type="text/x-handlebars-template">' %}
     <h1>You are {{!state}}.</h1>
 
     <div class="message"></div>
 
     {{!#if inGame }}
-          <div id="editor">def test(*args, **kwargs):
-    return 'hello world!'
-
-print test()</div>
-      <div class="btn btn-info" data-player-move="true">Submit.</div>
       <div class="btn btn-info" data-player-command="leave">Leave the game.</div>
     {{!else}}
       <div class="btn btn-info" data-player-command="ready">I am ready.</div>
       <div class="btn btn-info" data-player-command="not_ready">I am not ready.</div>
     {{!/if}}
-  {% raw '</script>' %}
-  
+  {# END JS TEMPLATE!!! #}{% raw '</script>' %}
 
   <div data-player-canvas="true"></div>
+  <br />
 
-  <div data-game-canvas="true"></div>
+  <div id="editor" class="hide"></div>
+  <div class="info" data-game-canvas="true"></div>
+
+
+  {# JS TEMPLATE!!! #}{% raw '<script id="game-template" type="text/x-handlebars-template">' %}
+    <h4>Rules</h4>
+
+    <ul>{{!#challenge.rules}}
+      {{!#cannot_contains}}
+        <li>Code cannot contain: "{{!this}}"</li>
+      {{!/cannot_contains}}
+      {{!#must_contains}}
+        <li>Code must contain: "{{!this}}"</li>
+      {{!/must_contains}}
+    {{!/challenge.rules}}
+    </ul>
+
+    <h4>Goal</h4>
+
+    <p>You must get the result:</p>
+
+    <pre>{{!challenge.goal.target}}</pre>
+
+    <br />
+
+    <div class="btn btn-info" data-player-move="true">Submit code!</div>
+    <p><small>Game ends in {{!challenge.time}} seconds.</small></p>
+
+    <br />
+    <br />
+
+    {{!#results}}
+      <h3>Results</h3>
+      <pre>{{!this}}</pre>
+    {{!/results}}
+
+    {{!#score}}
+      <h3>Score</h3>
+      <p>{{!this}}</pre>
+    {{!/score}}
+
+    {{!#errors}}
+      <h3>Errors</h3>
+      <p>{{!this}}</pre>
+    {{!/errors}}
+
+  {# END JS TEMPLATE!!! #}{% raw '</script>' %}
 
 {% end %}

@@ -18,7 +18,7 @@ callback = None
 players = set()
 games = set()
 
-COUNTDOWN = 10
+COUNTDOWN = 5
 countdown = int(COUNTDOWN)
 
 
