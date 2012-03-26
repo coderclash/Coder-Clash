@@ -23,6 +23,7 @@ class Player(object):
         self.socket = socket
         self.state = 'not_ready'
         self.game = None
+        self.best = None
 
 
     @fsm('ready', whence=['not_ready'])

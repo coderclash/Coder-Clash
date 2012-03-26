@@ -1,6 +1,7 @@
 import unittest
 
 from coderclash.engine.utils import fsm
+from coderclash.engine.game import Challenge, Rule, Goal
 
 
 class Car(object):
@@ -46,3 +47,32 @@ class FMSTest(unittest.TestCase):
         car.turn_off(silent=True)
         car.turn_off(silent=True) # can do it twice!
         self.assertEquals('off', car.state)
+
+
+class BasicGameTest(unittest.TestCase):
+    def setUp(self):
+        goal = Goal(target='1,2,3,4,5,6,7,8,9,10')
+        rule = Rule(cannot_contains=['range', '1,2,3,4,5,6,7,8,9,10'])
+        self.challenge = Challenge(goal=goal, rules=[rule])
+        self.code = """l,c=[],1
+while c<11:l+=[str(c)];c+=1
+print ','.join(l)"""
+
+    def test_load(self):
+        self.assertEquals(
+            {'rules': [{'must_contains': [], 'cannot_contains': ['range', '1,2,3,4,5,6,7,8,9,10']}], 'goal': {'target': '1,2,3,4,5,6,7,8,9,10'}, 'time': 60},
+            self.challenge.dict
+        )
+
+    def test_tick(self):
+        self.assertEquals(60, self.challenge.dict['time'])
+        self.challenge.tick()
+        self.assertEquals(59, self.challenge.dict['time'])
+
+    def test_failed_move(self):
+        code = '",".join([x for x in range(1, 10)'
+        score, errors = self.challenge.move(code)
+
+        print score, errors
+
+

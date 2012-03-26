@@ -5,6 +5,11 @@ Player = Backbone.Model.extend({
     return window.socket.emit('command', {
       command: command
     });
+  },
+  move: function(code) {
+    return window.socket.emit('move', {
+      code: code
+    });
   }
 });
 
@@ -19,16 +24,27 @@ PlayerWindow = Backbone.View.extend({
     return this.render();
   },
   render: function() {
-    var context;
+    var PythonMode, context;
     context = this.player.toJSON();
     context.inGame = context.state === 'in_game';
-    return this.$el.html(this.template(context));
+    this.$el.html(this.template(context));
+    if (context.inGame) {
+      console.log('in game');
+      this.editor = ace.edit('editor');
+      this.editor.setTheme('ace/theme/twilight');
+      PythonMode = require('ace/mode/python').Mode;
+      return this.editor.getSession().setMode(new PythonMode());
+    }
   },
   events: {
-    'click *[data-player-command]': 'dispatch'
+    'click *[data-player-command]': 'dispatch',
+    'click *[data-player-move]': 'move'
   },
   dispatch: function(e) {
     return this.player.dispatch($(e.currentTarget).attr('data-player-command'));
+  },
+  move: function(code) {
+    return this.player.move(this.editor.getSession().getValue());
   }
 });
 
@@ -42,10 +58,16 @@ $(document).ready(function() {
     el: $('div[data-player-canvas=true]'),
     player: player
   });
+  window.player = player;
+  window.player_view = player_view;
   window.socket.on('message', function(message) {
     return $('.message').text(message);
   });
-  return window.socket.on('state', function(state) {
-    return player.set(state.player);
+  window.socket.on('state', function(state) {
+    player.set(state.player);
+    if (state.game) return $('.message').text(state.game.challenge.time);
+  });
+  return window.socket.on('results', function(data) {
+    return console.log(data.score, data.results, data.errors);
   });
 });

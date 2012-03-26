@@ -1,8 +1,15 @@
 
 def fsm(target, whence='*', attr='state'):
     """
-    `target` should be the target state
-    `whence` should be a list of states that you can change from.
+    `target` -> (str): REQUIRED
+        should be the target state.
+
+    `whence` -> (list): '*'
+        should be a *list* of states that you can change from.
+
+    `attr` -> (str): 'state'
+        is the that of the attribute that represents state.
+
 
     Example:
 
@@ -33,7 +40,7 @@ def fsm(target, whence='*', attr='state'):
         def inner(self, *args, **kwargs):
             silent = kwargs.pop('silent', False)
 
-            # check that whence
+            # check that whence == curent state
             if whence == '*':
                 pass
             elif getattr(self, attr) in whence:

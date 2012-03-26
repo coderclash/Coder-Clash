@@ -26,7 +26,7 @@ class PlaySocket(tornadio2.SocketConnection):
     """
     This is the interface for speaking to the client through websockets. Game
     and Player state are constantly given to the client. The client sends
-    commands that update both their and the games state.
+    commands that update both their and the game's state.
     """
     def __init__(self, *args, **kwargs):
         super(PlaySocket, self).__init__(*args, **kwargs)
@@ -150,6 +150,8 @@ class PlaySocket(tornadio2.SocketConnection):
     @tornadio2.event
     def command(self, command):
         """
+        Receives commands.
+
         Allow the client to send commands. Only permit certain
         commands, block others. Try to run the command without
         raising any errors (silently).
@@ -159,3 +161,17 @@ class PlaySocket(tornadio2.SocketConnection):
         commands = ['ready', 'not_ready', 'leave']
         if command in commands:
             getattr(player, command)(silent=True)
+
+    @tornadio2.event
+    def move(self, code):
+        player = self.get_current_player()
+
+        if player.game:
+            score, results, errors = player.game.move(player, code)
+
+            player.socket.emit(
+                'results', 
+                score=score,
+                results=results,
+                errors=errors,
+            )
