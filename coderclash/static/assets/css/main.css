@@ -1,2 +1,16 @@
 body {
   padding-top: 60px; }
+
+#editor {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  float: left; }
+
+.info {
+  float: left;
+  width: 300px;
+  padding-left: 16px; }
+
+.hide {
+  display: none; }
