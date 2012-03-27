@@ -8,6 +8,7 @@ import tornado.web
 import tornadio2
 from tornado.options import define, options
 from coderclash import settings
+from coderclash.handlers import PlaySocket
 from coderclash.urls import urls
 
 
@@ -19,6 +20,8 @@ define('github_client_secret', default=settings.CLIENT_SECRET,
     help="Github Client Secret", type=str)
 define('github_callback_url', default=settings.CALLBACK_URL,
     help="Github Callback URL", type=str)
+define('cookie_secret', default='^&*)HLJKFD%*SDFGLJiglasfdoguasdf&^&^&',
+    help='Cookie Secret', type=str)
 
 
 class Application(tornado.web.Application):
@@ -29,7 +32,7 @@ class Application(tornado.web.Application):
             'debug': options.debug,
             'template_path': os.path.join(settings.BASE_DIR, 'templates'),
             'static_path': os.path.join(settings.BASE_DIR, 'static'),
-            'cookie_secret': '^&*)HLJKFD%*SDFGLJiglasfdoguasdf&^&^&',
+            'cookie_secret': options.cookie_secret,
             'login_url': '/auth/login/',
             'github_client_id': options.github_client_id,
             'github_client_secret': options.github_client_secret,
@@ -38,24 +41,26 @@ class Application(tornado.web.Application):
 
         tornado.web.Application.__init__(self, urls, **app_settings)
 
-# import play and get socket server running
-from coderclash.handlers import PlaySocket
+
 PlayRouter = tornadio2.router.TornadioRouter(PlaySocket)
 sock_app = tornado.web.Application(
     PlayRouter.urls,
-    #flash_policy_port = 843,
-    #flash_policy_file = os.path.join(settings.BASE_DIR, 'static/assets/flashpolicy.xml'),
-    socket_io_port = 8001
+    # flash_policy_port=843,
+    # flash_policy_file=os.path.join(settings.BASE_DIR,
+    #     'static/assets/flashpolicy.xml'),
+    socket_io_port=8001
 )
+
 
 def main():
     tornado.options.parse_command_line()
 
     # create http server
+    logging.info('Starting tornado on port {0}'.format(options.port))
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
 
-    # Create tornadio server on port 8002, but don't start it yet
+    # Create tornadio server on port 8001, but don't start it yet
     tornadio2.server.SocketServer(sock_app, auto_start=False)
 
     tornado.ioloop.IOLoop.instance().start()
