@@ -97,7 +97,6 @@ PlayerWindow = Backbone.View.extend
 
 
 
-
 $(document).ready ->
   window.socket = io.connect 'http://localhost:8001'
 
