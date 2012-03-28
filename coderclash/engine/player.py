@@ -1,4 +1,4 @@
-from coderclash.engine.utils import fsm
+from coderclash.engine.utils import fsm, make_name
 
 
 class Player(object):
@@ -19,11 +19,13 @@ class Player(object):
 
     """
 
+    state = 'not_ready'
+    game = None
+    best = None
+
     def __init__(self, socket):
         self.socket = socket
-        self.state = 'not_ready'
-        self.game = None
-        self.best = None
+        self.name = make_name()
 
 
     @fsm('ready', whence=['not_ready'])
@@ -64,4 +66,4 @@ class Player(object):
         return None
 
     def __unicode__(self):
-        return '<Player {0}>'.format(self.state)
+        return '<{0} {1}>'.format(self.name, self.state)

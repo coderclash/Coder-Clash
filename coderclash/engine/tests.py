@@ -72,7 +72,3 @@ print ','.join(l)"""
     def test_failed_move(self):
         code = '",".join([x for x in range(1, 10)'
         score, errors = self.challenge.move(code)
-
-        print score, errors
-
-

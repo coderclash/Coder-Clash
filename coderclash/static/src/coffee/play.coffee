@@ -29,7 +29,6 @@ GameWindow = Backbone.View.extend
   render: () ->
     if @game.get 'in_progress'
       context = @game.toJSON()
-      console.log context
       @$el.html @template(context)
 
       if @editor is null
@@ -63,7 +62,6 @@ Player = Backbone.Model.extend
     window.socket.emit 'command', { command: command }
 
   move: (code) ->
-    console.log 'sending code'
     window.socket.emit 'move', { code: code }
 
 
@@ -116,6 +114,11 @@ $(document).ready ->
     player: player
     game: game
 
+
+  window.socket.on 'connect', () ->
+    # TODO: maybe let them choose their name?
+    if USER
+      window.socket.emit 'set_name', { name: USER.name }
 
   window.socket.on 'message', (message) ->
     # misc messages (game start countdown)

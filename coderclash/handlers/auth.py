@@ -1,9 +1,9 @@
 import tornado.web
-from coderclash.handlers.base import BaseHandler
+from coderclash.handlers.base import BaseHandlerMixin
 from coderclash.auth import github
 
 
-class AuthLogin(BaseHandler, github.GithubAuthMixin):
+class AuthLogin(BaseHandlerMixin, tornado.web.RequestHandler, github.GithubAuthMixin):
     """
     Asynchronously handles user authentication with the github api.
 

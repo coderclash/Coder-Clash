@@ -1,16 +1,21 @@
 import tornadio2
+import tornado
+import tornado.web
 import tornado.ioloop
 from datetime import datetime
 
-from coderclash.handlers.base import BaseHandler
+from coderclash.handlers.base import BaseHandlerMixin
 
 from coderclash.engine import Player, Game
 
 
-class Play(BaseHandler):
+class Play(BaseHandlerMixin, tornado.web.RequestHandler):
     def get(self):
         user = self.get_current_user()
-        self.write(self.render('play/play.html', user=user))
+        self.write(self.render('play/play.html',
+                user=user,
+                user_json=tornado.escape.json_encode(user)
+        ))
 
 
 callback = None
@@ -27,6 +32,8 @@ class PlaySocket(tornadio2.SocketConnection):
     This is the interface for speaking to the client through websockets. Game
     and Player state are constantly given to the client. The client sends
     commands that update both their and the game's state.
+
+    TODO: access
     """
     def __init__(self, *args, **kwargs):
         super(PlaySocket, self).__init__(*args, **kwargs)
@@ -49,8 +56,8 @@ class PlaySocket(tornadio2.SocketConnection):
 
     def print_info(self):
         print datetime.now()
-        print ' ', 'players', [unicode(p) for p in players]
-        print ' ', 'games', [unicode(g) for g in games]
+        print '  ', 'players', [unicode(p) for p in players]
+        print '  ', 'games', [unicode(g) for g in games]
 
     def on_message(self, message):
         pass
@@ -175,3 +182,8 @@ class PlaySocket(tornadio2.SocketConnection):
                 results=results,
                 errors=errors,
             )
+
+    @tornadio2.event
+    def set_name(self, name):
+        player = self.get_current_player()
+        player.name = name

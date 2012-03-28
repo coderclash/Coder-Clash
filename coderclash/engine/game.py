@@ -1,5 +1,3 @@
-
-
 class Goal(object):
     """
     A generic code golf goal.
@@ -151,7 +149,6 @@ class Game(object):
         rule = Rule(cannot_contains=['range', '1,2,3,4,5,6,7,8,9,10'])
         self.challenge = Challenge(goal=goal, rules=[rule])
 
-        self.scores = {}
         self.state = 'pregame'
 
     def tick(self):
@@ -178,6 +175,22 @@ class Game(object):
 
         return 0, '', ['No challenge in progress.']
 
+    def scores(self):
+        """
+        Returns a list of dicts with player names and their scores.
+        """
+        scores = []
+
+        for player in self.players:
+            score = 0
+
+            if player.best:
+                score = player.best[0]
+
+            scores.append(dict(name=player.name, score=score))
+
+        return scores
+
 
     def close(self):
         for player in set(self.players):
@@ -192,9 +205,7 @@ class Game(object):
                 p.get_state() for p in self.players
             ],
             challenge=self.challenge.dict if self.challenge else None,
-            scores=dict([
-                [p.get_state(), score] for p, score in self.scores.items()
-            ])
+            scores=self.scores()
         )
 
     def __unicode__(self):

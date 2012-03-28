@@ -30,7 +30,6 @@ GameWindow = Backbone.View.extend({
     var context;
     if (this.game.get('in_progress')) {
       context = this.game.toJSON();
-      console.log(context);
       this.$el.html(this.template(context));
       if (this.editor === null) return this.createEditor();
     } else {
@@ -65,7 +64,6 @@ Player = Backbone.Model.extend({
     });
   },
   move: function(code) {
-    console.log('sending code');
     return window.socket.emit('move', {
       code: code
     });
@@ -113,6 +111,13 @@ $(document).ready(function() {
     el: $('div[data-game-canvas=true]'),
     player: player,
     game: game
+  });
+  window.socket.on('connect', function() {
+    if (USER) {
+      return window.socket.emit('set_name', {
+        name: USER.name
+      });
+    }
   });
   window.socket.on('message', function(message) {
     return $('.message').text(message);
